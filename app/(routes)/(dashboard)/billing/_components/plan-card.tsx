@@ -109,7 +109,7 @@ const PlanCard = React.memo(
         </div>
 
         {loading ? (
-          <Skeleton className="h-8 w-28 rounded-md" />
+          <Skeleton className="h-8 w-full rounded-md" />
         ) : error ? (
           <div className="text-sm text-destructive">
             Failed to load generations
