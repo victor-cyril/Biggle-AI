@@ -12,7 +12,6 @@ export const createNote = (userId: string) =>
       content: z.string().describe("The content/body of the note"),
     }),
     execute: async ({ title, content }) => {
-      console.log("CREATE NOTE TOOL CALL");
       try {
         const note = await prisma.note.create({
           data: {

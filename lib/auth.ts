@@ -67,6 +67,9 @@ export const auth = betterAuth({
             console.log("Subscription canceled", data);
             await updateSubscriptionPlan(data);
           },
+          // onCustomerStateChanged: async ({ data }) => {
+          //   console.log("Customer state changed", data);
+          // },
           // onSubscriptionActive: async ({ data }) => {
           //   // Handle subscription created event
           //   // Update user account stats based on the new subscription plan

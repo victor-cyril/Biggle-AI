@@ -119,6 +119,29 @@ export async function updateSubscriptionPlan(data: Subscription) {
       });
     }
 
+    if (data.status === "canceled") {
+      // If already on free plan, no need to update
+      if (
+        subscription.plan === PLAN_ENUM.FREE &&
+        subscription.status === "active"
+      ) {
+        return { success: true, updatedSubscription: subscription };
+      }
+
+      // Downgrade to free plan on cancellation
+      const updatedSubscription = await prisma.subscription.update({
+        where: { id: subscription.id },
+        data: {
+          referenceId: user.id,
+          plan: PLAN_ENUM.FREE,
+          polarCustomerId: data.customerId,
+          status: "active",
+        },
+      });
+
+      return { success: true, updatedSubscription };
+    }
+
     let plan = newPlan.name;
 
     if (

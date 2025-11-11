@@ -19,8 +19,6 @@ const SingleChat = () => {
   const title = chat?.title ?? "Untitled";
   const initialMessages = chat?.messages ?? [];
 
-  console.log({ chat, initialMessages });
-
   return (
     <>
       <Header title={title} showActions />

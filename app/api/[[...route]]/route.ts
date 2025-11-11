@@ -12,9 +12,7 @@ const app = new Hono();
 
 app.onError(async (err, c) => {
   if (err instanceof HTTPException) {
-    return c.json({
-      error: await err.getResponse().text(),
-    });
+    return err.getResponse();
   }
   return c.json({
     error: "internal error",

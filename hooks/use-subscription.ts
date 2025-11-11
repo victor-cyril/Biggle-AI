@@ -39,7 +39,6 @@ export const useCheckGenerations = () => {
       const response = await api.subscription.generations.$get();
       if (!response.ok) throw new Error("Failed to fetch generation");
       const { data } = await response.json();
-      console.log({ data });
       return data;
     },
     refetchOnMount: true,

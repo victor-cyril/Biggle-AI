@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   PAID_PLAN_ENUM_TYPE,
   PLAN_ENUM,
+  PLAN_ENUM_VALUE,
   POLAR_PLANS,
   UPGRADEABLE_PLANS,
 } from "@/lib/polar/plans";
@@ -27,19 +28,18 @@ interface Props {
 
 const PlanCard = React.memo(
   ({ plan, subscription, loading, error, isUpgrading, onUpgrade }: Props) => {
+    const isFree = plan.name === PLAN_ENUM.FREE;
     const isPopular = plan.name === PLAN_ENUM.PREMIUM;
     const isCurrent = subscription?.plan === plan.name;
     const action = subscription?.hasPaidSubscription
       ? "Switch plan"
       : "Upgrade";
+    const [planClicked, setPlanClicked] =
+      React.useState<PLAN_ENUM_VALUE | null>(null);
 
     const generationsUsed = isCurrent ? subscription?.generationsUsed ?? 0 : 0;
 
     const generationsLimit = isCurrent ? subscription?.generationsLimit : null;
-
-    const remainingGenerations = isCurrent
-      ? subscription?.remainingGenerations
-      : null;
 
     const percentUsed =
       generationsLimit && generationsLimit > 0
@@ -76,16 +76,18 @@ const PlanCard = React.memo(
             </div>
           </div>
 
-          {isCurrent && subscription?.subscriptionDetails?.currentPeriodEnd && (
-            <p className="text-sm mb-2 text-primary">
-              {subscription?.subscriptionDetails?.cancelAtPeriodEnd
-                ? "Cancels on "
-                : "Renews on "}
-              {new Date(
-                subscription.subscriptionDetails.currentPeriodEnd
-              ).toLocaleDateString()}
-            </p>
-          )}
+          {isCurrent &&
+            subscription?.subscriptionDetails?.currentPeriodEnd &&
+            !isFree && (
+              <p className="text-sm mb-2 text-primary">
+                {subscription?.subscriptionDetails?.cancelAtPeriodEnd
+                  ? "Cancels on "
+                  : "Renews on "}
+                {new Date(
+                  subscription.subscriptionDetails.currentPeriodEnd
+                ).toLocaleDateString()}
+              </p>
+            )}
 
           {isCurrent && (
             <div className="mb-4 text-sm text-muted-foreground">
@@ -93,11 +95,11 @@ const PlanCard = React.memo(
                 "Unlimited generations"
               ) : (
                 <>
-                  {remainingGenerations} / {generationsLimit} generations left
+                  {generationsUsed} / {generationsLimit} generations used
                   <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden mt-1">
                     <div
                       className="h-3 bg-orange-500 rounded-full transition-all duration-300"
-                      style={{ width: `${percentUsed}` }}
+                      style={{ width: `${percentUsed}%` }}
                     />
                   </div>
                 </>
@@ -126,10 +128,13 @@ const PlanCard = React.memo(
               "cursor-pointer",
               isPopular && "bg-primary hover:opacity-80 text-white"
             )}
-            disabled={isUpgrading}
-            onClick={() => onUpgrade(plan.name as PAID_PLAN_ENUM_TYPE)}
+            disabled={isUpgrading && planClicked === plan.name}
+            onClick={() => {
+              setPlanClicked(plan.name);
+              onUpgrade(plan.name as PAID_PLAN_ENUM_TYPE);
+            }}
           >
-            {isUpgrading ? (
+            {isUpgrading && planClicked === plan.name ? (
               <Loader className="w-4 h-4 animate-spin" />
             ) : (
               <>{action}</>

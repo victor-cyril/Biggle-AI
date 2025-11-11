@@ -10,6 +10,7 @@ import ChatInput from "./chat-input";
 import { ToolNameEnum } from "@/lib/ai/tools/constant";
 import { useQueryClient } from "@tanstack/react-query";
 import ChatMessages from "./chat-messages";
+import { useCheckGenerations } from "@/hooks/use-subscription";
 // import { useCheckGenerations } from "@/features/use-subscription";
 
 type Props = {
@@ -31,11 +32,7 @@ const ChatInterface = (props: Props) => {
   const queryClient = useQueryClient();
   const [input, setInput] = useState<string>("");
 
-  // const { data: subscription } = useCheckGenerations();
-  const subscription = {
-    generationsLimit: 100,
-    generationsUsed: 50,
-  };
+  const { data: subscription } = useCheckGenerations();
 
   const { messages, setMessages, sendMessage, status, stop, error } =
     useChat<UIMessage>({
@@ -134,10 +131,10 @@ const ChatInterface = (props: Props) => {
 
 function GenerationLimitAlert() {
   return (
-    <div className="w-full absolute -top-6 mt-[0.3]">
+    <div className="w-full absolute -top-7">
       <div
         className="bg-primary/10 font-medium rounded-t-3xl
-        px-4 pt-1.5 pb-4 flex items-center justify-between text-xs w-full overflow-hidden"
+        px-4 pt-2 pb-5 flex items-center justify-between text-xs w-full overflow-hidden"
       >
         <div className="wrap-break-word">
           You’ve run out of free AI responses.{" "}

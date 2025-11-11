@@ -15,8 +15,8 @@ const AppPreview = () => {
               <Image
                 src={
                   isDark
-                    ? "/images/wave_app-dark.png"
-                    : "/images/wave_app-light.png"
+                    ? "/images/biggle-dark.png"
+                    : "/images/biggle-light.png"
                 }
                 alt="app screen"
                 width="2880"

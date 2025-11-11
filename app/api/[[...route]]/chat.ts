@@ -23,6 +23,8 @@ import {
   checkGenerationLimit,
   generateTitleForUserMessage,
 } from "@/actions/server-actions/action";
+import { auth } from "@/lib/auth";
+import { POLAR_IMAGE_EVENT } from "@/lib/polar/plans";
 
 const chatSchema = z.object({
   id: z.string().min(1),
@@ -42,9 +44,9 @@ export const chatRoute = new Hono()
       const { id, message, selectedModelId, selectedToolName } =
         c.req.valid("json");
 
-      const { isAllowed } = await checkGenerationLimit(user.id);
+      const { isAllowed, plan } = await checkGenerationLimit(user.id);
 
-      if (!isAllowed) {
+      if (!isAllowed || !plan) {
         throw new HTTPException(403, {
           message: "Generation limit reached",
         });
@@ -118,14 +120,27 @@ export const chatRoute = new Hono()
         },
       });
 
+      //
+
       // Return the streaming response, Convert back to UIMessageStreamResponse
       return result.toUIMessageStreamResponse({
         sendSources: true,
         generateMessageId: () => generateUUID(),
         //originalMessages: newUIMessages,
         onFinish: async ({ messages, responseMessage }) => {
-          console.log("complete message", responseMessage);
           try {
+            // Call the polar image generation event
+
+            if (plan === "plus") {
+              await auth.api.ingestion({
+                body: {
+                  event: POLAR_IMAGE_EVENT,
+                  metadata: { userId: user.id },
+                },
+                headers: c.req.raw.headers,
+              });
+            }
+
             await prisma.message.createMany({
               data: messages.map((m) => ({
                 id: m.id || generateUUID(),
@@ -144,6 +159,7 @@ export const chatRoute = new Hono()
       });
     } catch (error) {
       if (error instanceof HTTPException) {
+        console.log("HTTP error", error);
         throw error;
       }
       throw new HTTPException(500, { message: "Internal server error" });

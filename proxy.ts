@@ -12,7 +12,6 @@ export async function proxy(req: NextRequest) {
   // Single session fetch
   const session = getSessionCookie(req);
 
-  console.log("IsAuth =>", !!session, session);
   const isApiAuthRoute = pathname.startsWith(apiLinks.authPrefix);
   const isAccessibleApiRoute = accessibleApiRoutes.some((route) =>
     pathname.startsWith(route)
@@ -20,7 +19,8 @@ export async function proxy(req: NextRequest) {
   const isAccessibleRoute = checkIsPublicRoute(pathname);
 
   // Approve public api routes
-  if (isApiAuthRoute || isAccessibleApiRoute) return NextResponse.next();
+  if (isApiAuthRoute || isAccessibleApiRoute || pathname === "/")
+    return NextResponse.next();
 
   if (!session && !isAccessibleRoute) {
     const searchParams = url.searchParams.toString();
@@ -44,5 +44,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: "/((?!api|trpc|_next|_vercel|.*\\..*).*)",
+  matcher: ["/((?!api|trpc|_next|_vercel|.*\\..*).*)", "/"],
 };

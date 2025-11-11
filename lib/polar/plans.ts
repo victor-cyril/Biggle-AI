@@ -1,5 +1,7 @@
 import { Plan } from "@/prisma/generated/prisma/enums";
 
+export const POLAR_IMAGE_EVENT = "biggle-ai-usage";
+
 export const PLAN_ENUM = {
   FREE: Plan.free,
   PLUS: Plan.plus,
@@ -20,7 +22,7 @@ export const PLAN_TO_PRICE: Record<PLAN_ENUM_TYPE, number> = {
 
 export const PLAN_TO_GENERATION_LIMITS: Record<PLAN_ENUM_TYPE, number> = {
   FREE: 10,
-  PLUS: 300,
+  PLUS: 1000,
   PREMIUM: Infinity,
 };
 
